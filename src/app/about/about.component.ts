@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from "@angular/core";
 import { interval, timer, fromEvent, Observable } from "rxjs";
+import { createHttpObservable } from "../common/util";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "about",
@@ -163,6 +165,30 @@ export class AboutComponent implements OnInit {
     // );
     // // in next example, we will use the rxjs map() operator to convert the raw json payload to an array of courses
     // end of video 1.9
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 2.1
+    // in this lesson, we will create a courses observable that will emit the courses as values
+    // refer to official doc of the map() operator at reactivex.io
+    // an operator is a method of deriving one observable from another
+    // map() takes the data from a source observable and 'maps' or manipulates the incoming values and emits new values as an observable
+    const http$ = createHttpObservable("api/courses");
+
+    // pipe() allows us to chain multiple operators to produce a new observable
+    const courses$ = http$.pipe(map((res) => Object.values(res["payload"])));
+
+    courses$.subscribe(
+      (courses) => {
+        console.log(courses);
+      },
+      (err) => {
+        console.log(err);
+      },
+      () => {
+        console.log("http$ observable completed!");
+      }
+    );
+    // end of video 2.1
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 }
