@@ -10,6 +10,7 @@ export class AboutComponent implements OnInit {
   constructor() {}
 
   ngOnInit() {
+    ////////////////////////////////////////////////////////////////////////////////////////////
     // // video 1.5
     // // stream examples 1 and 2 never complete, they continue emitting values
     // // stream example 3 completes after emitting one value
@@ -32,6 +33,10 @@ export class AboutComponent implements OnInit {
     //   console.log("finished...");
     // }, 3000);
 
+    // end of video 1.5
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
     // // video 1.6
     // // if we want the streams to start in a sequence, we will have to nest them within each other
     // // continued nesting in a similar fashion is referred to as 'callback hell'
@@ -52,6 +57,10 @@ export class AboutComponent implements OnInit {
     // // the default java callback interface does not scale well in complexity
     // // more nesting makes code hard to read and reason about
 
+    // end of video 1.6
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
     // video 1.7
     // // like the streams we saw in previous examples, we can implement our own custom streams
     // // we can use the interval() method from rxjs to define a custom stream
@@ -91,5 +100,41 @@ export class AboutComponent implements OnInit {
     // click$.subscribe((evt) => {
     //   console.log(evt);
     // });
+
+    // end of video 1.7
+    ////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // // video 1.8
+    // // an observable is a blueprint for a stream
+    // // we can derive instances of a stream from an obserable by subscribing to it
+    // // in last example, we passed only one arg to subscribe(), we can pass more also
+    // // second arg is an error handler
+    // // third arg is handler for when the stream completes i.e. emits last value
+    // // observable contract: if it errors out or completes, it will not emit values again
+    // // according to contract, error and completion are exclusive i.e. only one of them happens
+
+    // // if we want to stop the values emitting after 5 seconds
+    // const interval$ = timer(3000, 1000);
+    // const sub = interval$.subscribe((val) => console.log("stream1: " + val));
+    // setTimeout(() => {
+    //   sub.unsubscribe();
+    // }, 5000);
+
+    // const click$ = fromEvent(document, "click");
+    // click$.subscribe(
+    //   (evt) => {
+    //     console.log(evt);
+    //   },
+    //   (err) => {
+    //     console.log(err);
+    //   },
+    //   () => {
+    //     console.log("stream completed");
+    //   }
+    // );
+
+    // end of video 1.8
+    ////////////////////////////////////////////////////////////////////////////////////////////
   }
 }
