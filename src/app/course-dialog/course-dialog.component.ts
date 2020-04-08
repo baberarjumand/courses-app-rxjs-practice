@@ -72,22 +72,22 @@ export class CourseDialogComponent implements OnInit, AfterViewInit {
     // the second stream of values is going to be one http req that saves the current value of the form
     // first let's implement this logic without using observables
     // this implementation leads to nested observable calls, this is something we want to avoid in rxjs
-    this.form.valueChanges
-      .pipe(filter(() => this.form.valid))
-      .subscribe((changes) => {
-        const saveCourse$ = fromPromise(
-          fetch(`/api/courses/${this.course.id}`, {
-            method: "PUT",
-            body: JSON.stringify(changes),
-            headers: {
-              "content-type": "application/json",
-            },
-          })
-        );
+    // this.form.valueChanges
+    //   .pipe(filter(() => this.form.valid))
+    //   .subscribe((changes) => {
+    //     const saveCourse$ = fromPromise(
+    //       fetch(`/api/courses/${this.course.id}`, {
+    //         method: "PUT",
+    //         body: JSON.stringify(changes),
+    //         headers: {
+    //           "content-type": "application/json",
+    //         },
+    //       })
+    //     );
 
-        // this will trigger the http request
-        saveCourse$.subscribe();
-      });
+    //     // this will trigger the http request
+    //     saveCourse$.subscribe();
+    //   });
 
     // this implementation results in a http req made each time a change is made in the form
     // every letter that is changed and typed results in a http call
@@ -101,6 +101,64 @@ export class CourseDialogComponent implements OnInit, AfterViewInit {
 
     // end of video 2.7
     ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 2.8
+
+    // we will see in this lesson a practical use of observable concatenation
+    // we will see why concatenation is ideally suited for save operations
+    // we want to make sure our save operations happen in the same order our form values are emitted
+    // our implementation in the last lesson does not provide that logic
+
+    // we want to take the values of the source observable
+    // and for each value, create a new save observable
+    // then we want to concatenate all those derived observables, so that they execute in sequence
+    // this will ensure the save operations are done in the right order
+    // we have a mixture now of a mapping operation, where we are taking the value of
+    // form.valueChanges observable, and we are creating from it a second saveCourse$ observable
+    // this mixture of transforming one observable into another and concatenating the result together
+    // is best implemented using the concatMap() rxjs operator
+    // refer to official doc of concatMap() @ reactivex.io
+    // concatMap() will listen to values from first observable, map them to output
+    // then when all the first observable values are mapped and the first observable completes,
+    // then the concatMap() will start listening to the values emitted from the second observable,
+    // and start mapping them, it CONCATS and MAPS each observable in sequence
+    // only when the first observable completes is when the second observable values start getting mapped
+
+    // in our case of the form on this page, we want to take the form values,
+    // turn them into http requests and wait for the first http req to complete before
+    // creating and executing the second http request
+
+    this.form.valueChanges
+      .pipe(
+        filter(() => this.form.valid),
+        concatMap((changes) => this.saveCourse(changes))
+      )
+      .subscribe();
+
+    // on inspecting the http requests using browser dev tools, we observe that the http requests
+    // do not overlap anymore and are executed in sequence as expected
+    // the second save operation is only triggered once the first one completes
+    // later in the course, we will see another operator that will allow us to reduce the number of reqs
+    // that will be the debounceTime() operator
+
+    // what if instead of having our operations execute in sequence like in this lesson,
+    // what if we want the operations to execute in parallel, as fast as possible
+    // this will lead us to another observable strategy called MERGE in the next lesson
+
+    // end of video 2.8
+    ////////////////////////////////////////////////////////////////////////////////////////////
+  }
+
+  saveCourse(changes) {
+    return fromPromise(
+      fetch(`/api/courses/${this.course.id}`, {
+        method: "PUT",
+        body: JSON.stringify(changes),
+        headers: {
+          "content-type": "application/json",
+        },
+      })
+    );
   }
 
   ngAfterViewInit() {}
