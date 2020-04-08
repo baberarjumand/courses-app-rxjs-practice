@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewEncapsulation } from "@angular/core";
-import { interval, timer, fromEvent, Observable } from "rxjs";
+import { interval, timer, fromEvent, Observable, of, concat } from "rxjs";
 import { createHttpObservable } from "../common/util";
 import { map } from "rxjs/operators";
 
@@ -173,10 +173,8 @@ export class AboutComponent implements OnInit {
     // an operator is a method of deriving one observable from another
     // map() takes the data from a source observable and 'maps' or manipulates the incoming values and emits new values as an observable
     // const http$ = createHttpObservable("api/courses");
-
     // // pipe() allows us to chain multiple operators to produce a new observable
     // const courses$ = http$.pipe(map((res) => Object.values(res["payload"])));
-
     // courses$.subscribe(
     //   (courses) => {
     //     console.log(courses);
@@ -189,6 +187,44 @@ export class AboutComponent implements OnInit {
     //   }
     // );
     // end of video 2.1
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 2.6
+    // in the next few lessons, we will explore new ways of combining observables
+    // in this lesson, we will see an intro to observable concatenation
+    // in next lesson, we will see a practical use case in the scenario of http reqs using concatMap()
+
+    // of() is used to create observables of all sorts
+    // this observable will emit values 1, 2, 3 and then complete
+    const source1$ = of(1, 2, 3);
+
+    // if we replace source1$ with an observable that never completes, source2$ and source3$ will never be subscribed to
+    // therefore, source2$ and source3$ will never emit their values
+    // because source1$ never completes
+    // const source1$ = interval(1000);
+
+    // this observable will emit values 4, 5, 6 and then complete
+    const source2$ = of(4, 5, 6);
+
+    const source3$ = of(7, 8, 9);
+
+    // we want to combine the 2 observables source1$ and source2$ such that
+    // source1$ emits its values first and completes
+    // only after source1$ completes can then source2$ emit its values and complete
+    // this is a simple example of sequential concatenation
+    // refer to concat() official doc @ reactivex.io
+
+    // concat() operator will internally subscribe to each observable in sequence
+    // it will subscribe to source2$ only when source1$ is completed
+    // it will subscribe to source3$ only when source2$ is completed
+    const result$ = concat(source1$, source2$, source3$);
+    // result$.subscribe((val) => console.log(val));
+
+    // an alternate way to log the output
+    result$.subscribe(console.log);
+
+    // in the next lesson, we will see a practical use case of this concatenation concept
+    // end of video 2.6
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 }
