@@ -172,22 +172,22 @@ export class AboutComponent implements OnInit {
     // refer to official doc of the map() operator at reactivex.io
     // an operator is a method of deriving one observable from another
     // map() takes the data from a source observable and 'maps' or manipulates the incoming values and emits new values as an observable
-    const http$ = createHttpObservable("api/courses");
+    // const http$ = createHttpObservable("api/courses");
 
-    // pipe() allows us to chain multiple operators to produce a new observable
-    const courses$ = http$.pipe(map((res) => Object.values(res["payload"])));
+    // // pipe() allows us to chain multiple operators to produce a new observable
+    // const courses$ = http$.pipe(map((res) => Object.values(res["payload"])));
 
-    courses$.subscribe(
-      (courses) => {
-        console.log(courses);
-      },
-      (err) => {
-        console.log(err);
-      },
-      () => {
-        console.log("http$ observable completed!");
-      }
-    );
+    // courses$.subscribe(
+    //   (courses) => {
+    //     console.log(courses);
+    //   },
+    //   (err) => {
+    //     console.log(err);
+    //   },
+    //   () => {
+    //     console.log("http$ observable completed!");
+    //   }
+    // );
     // end of video 2.1
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
