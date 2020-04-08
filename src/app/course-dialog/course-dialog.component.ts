@@ -147,6 +147,19 @@ export class CourseDialogComponent implements OnInit, AfterViewInit {
 
     // end of video 2.8
     ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 2.9
+
+    // in the last lesson, we looked at the concat strategy of combining observables
+    // concat is all about completion, waiting for one observable to complete before
+    // subscribing and using the next observable
+    // now we will see a new strategy of combining observables, the MERGE strategy
+
+    // first let us introduce merge and then cover merge map
+    // refer to about component to find code for this video
+
+    // end of video 2.9
+    ////////////////////////////////////////////////////////////////////////////////////////////
   }
 
   saveCourse(changes) {

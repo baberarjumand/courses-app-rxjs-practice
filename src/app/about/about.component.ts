@@ -1,5 +1,13 @@
 import { Component, OnInit, ViewEncapsulation } from "@angular/core";
-import { interval, timer, fromEvent, Observable, of, concat } from "rxjs";
+import {
+  interval,
+  timer,
+  fromEvent,
+  Observable,
+  of,
+  concat,
+  merge,
+} from "rxjs";
 import { createHttpObservable } from "../common/util";
 import { map } from "rxjs/operators";
 
@@ -193,38 +201,60 @@ export class AboutComponent implements OnInit {
     // in the next few lessons, we will explore new ways of combining observables
     // in this lesson, we will see an intro to observable concatenation
     // in next lesson, we will see a practical use case in the scenario of http reqs using concatMap()
-
-    // of() is used to create observables of all sorts
-    // this observable will emit values 1, 2, 3 and then complete
-    const source1$ = of(1, 2, 3);
-
-    // if we replace source1$ with an observable that never completes, source2$ and source3$ will never be subscribed to
-    // therefore, source2$ and source3$ will never emit their values
-    // because source1$ never completes
-    // const source1$ = interval(1000);
-
-    // this observable will emit values 4, 5, 6 and then complete
-    const source2$ = of(4, 5, 6);
-
-    const source3$ = of(7, 8, 9);
-
-    // we want to combine the 2 observables source1$ and source2$ such that
-    // source1$ emits its values first and completes
-    // only after source1$ completes can then source2$ emit its values and complete
-    // this is a simple example of sequential concatenation
-    // refer to concat() official doc @ reactivex.io
-
-    // concat() operator will internally subscribe to each observable in sequence
-    // it will subscribe to source2$ only when source1$ is completed
-    // it will subscribe to source3$ only when source2$ is completed
-    const result$ = concat(source1$, source2$, source3$);
-    // result$.subscribe((val) => console.log(val));
-
-    // an alternate way to log the output
-    result$.subscribe(console.log);
-
+    // // of() is used to create observables of all sorts
+    // // this observable will emit values 1, 2, 3 and then complete
+    // const source1$ = of(1, 2, 3);
+    // // if we replace source1$ with an observable that never completes, source2$ and source3$ will never be subscribed to
+    // // therefore, source2$ and source3$ will never emit their values
+    // // because source1$ never completes
+    // // const source1$ = interval(1000);
+    // // this observable will emit values 4, 5, 6 and then complete
+    // const source2$ = of(4, 5, 6);
+    // const source3$ = of(7, 8, 9);
+    // // we want to combine the 2 observables source1$ and source2$ such that
+    // // source1$ emits its values first and completes
+    // // only after source1$ completes can then source2$ emit its values and complete
+    // // this is a simple example of sequential concatenation
+    // // refer to concat() official doc @ reactivex.io
+    // // concat() operator will internally subscribe to each observable in sequence
+    // // it will subscribe to source2$ only when source1$ is completed
+    // // it will subscribe to source3$ only when source2$ is completed
+    // const result$ = concat(source1$, source2$, source3$);
+    // // result$.subscribe((val) => console.log(val));
+    // // an alternate way to log the output
+    // result$.subscribe(console.log);
     // in the next lesson, we will see a practical use case of this concatenation concept
     // end of video 2.6
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 2.9
+    // in the last lesson, we looked at the concat strategy of combining observables
+    // concat is all about completion, waiting for one observable to complete before
+    // subscribing and using the next observable
+    // now we will see a new strategy of combining observables, the MERGE strategy
+
+    // first let us introduce merge and then cover merge map
+    // refer to official doc of merge() @ reactivex.io
+    // merge is used when we subscribe to multiple observables
+    // and subscribe to all of them at the same time
+    // merge is ideal for performing async operations in parallel
+    // the merge observable emits values as it receives them from multiple subscribed observables
+    // the merge observable completes only when all the merged observables complete
+    // however, if any one of the merged observables throws an error,
+    // then the resulting merged observable errors out immediately
+
+    const interval1$ = interval(1000);
+    const interval2$ = interval1$.pipe(map((val) => val * 10));
+
+    const result$ = merge(interval1$, interval2$);
+
+    result$.subscribe(console.log);
+
+    // the merge strategy is ideal for performing long running operations in parallel
+    // and getting the results of each of the operations combined
+    // in the next lesson, lets look at a practical use case
+
+    // end of video 2.9
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 }
