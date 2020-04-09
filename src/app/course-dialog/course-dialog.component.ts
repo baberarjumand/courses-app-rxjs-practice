@@ -72,6 +72,7 @@ export class CourseDialogComponent implements OnInit, AfterViewInit {
     // the second stream of values is going to be one http req that saves the current value of the form
     // first let's implement this logic without using observables
     // this implementation leads to nested observable calls, this is something we want to avoid in rxjs
+
     // this.form.valueChanges
     //   .pipe(filter(() => this.form.valid))
     //   .subscribe((changes) => {
@@ -206,7 +207,40 @@ export class CourseDialogComponent implements OnInit, AfterViewInit {
     );
   }
 
-  ngAfterViewInit() {}
+  ngAfterViewInit() {
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 2.11
+
+    // in this lesson, we will cover the exhaustMap() operator
+    // when can this operator be useful?
+    // in the edit dialog, we want to prevent the user from hitting the save button multiple times
+    // and trigger multiple parallel calls to the backend
+    // notice that the clicks on the SAVE button are also a stream of values
+    // we will subscribe to this stream of click values, and when we get a click,
+    // we are going to map that click value into an observable
+
+    // in this scenario, when we use concatMap(), and when the user presses save multiple times,
+    // as expected of concatMap(), the reqs are completed one at a time in sequence
+    // we need this behavior when implementing the autosave feature because we want to save the
+    // last value typed by the user
+    // but in the case of the SAVE button, it makes sense to ignore the repeated clicks
+    // we can ignore the clicks made in the SAVE button while a save op is already
+    // ongoing by using the exhaustMap() operator
+    // refer to official doc for exhaustMap() @ reactivex.io
+
+    // until the active observable completes, all emitted values from other observables
+    // are essentially ignored
+
+    fromEvent(this.saveButton.nativeElement, "click")
+      .pipe(exhaustMap(() => this.saveCourse(this.form.value)))
+      .subscribe();
+
+    // on inspecting the http calls using the browser dev tools,
+    // we observe that all clicks are ignored while a save op is ongoing and
+    // until a http call completes
+    // end of video 2.11
+    ////////////////////////////////////////////////////////////////////////////////////////////
+  }
 
   close() {
     this.dialogRef.close();

@@ -228,32 +228,26 @@ export class AboutComponent implements OnInit {
     ////////////////////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////////////////////
     // start of video 2.9
-    // in the last lesson, we looked at the concat strategy of combining observables
-    // concat is all about completion, waiting for one observable to complete before
-    // subscribing and using the next observable
-    // now we will see a new strategy of combining observables, the MERGE strategy
-
-    // first let us introduce merge and then cover merge map
-    // refer to official doc of merge() @ reactivex.io
-    // merge is used when we subscribe to multiple observables
-    // and subscribe to all of them at the same time
-    // merge is ideal for performing async operations in parallel
-    // the merge observable emits values as it receives them from multiple subscribed observables
-    // the merge observable completes only when all the merged observables complete
-    // however, if any one of the merged observables throws an error,
-    // then the resulting merged observable errors out immediately
-
+    // // in the last lesson, we looked at the concat strategy of combining observables
+    // // concat is all about completion, waiting for one observable to complete before
+    // // subscribing and using the next observable
+    // // now we will see a new strategy of combining observables, the MERGE strategy
+    // // first let us introduce merge and then cover merge map
+    // // refer to official doc of merge() @ reactivex.io
+    // // merge is used when we subscribe to multiple observables
+    // // and subscribe to all of them at the same time
+    // // merge is ideal for performing async operations in parallel
+    // // the merge observable emits values as it receives them from multiple subscribed observables
+    // // the merge observable completes only when all the merged observables complete
+    // // however, if any one of the merged observables throws an error,
+    // // then the resulting merged observable errors out immediately
     // const interval1$ = interval(1000);
     // const interval2$ = interval1$.pipe(map((val) => val * 10));
-
     // const result$ = merge(interval1$, interval2$);
-
     // result$.subscribe(console.log);
-
-    // the merge strategy is ideal for performing long running operations in parallel
-    // and getting the results of each of the operations combined
-    // in the next lesson, lets look at a practical use case
-
+    // // the merge strategy is ideal for performing long running operations in parallel
+    // // and getting the results of each of the operations combined
+    // // in the next lesson, lets look at a practical use case
     // end of video 2.9
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
