@@ -250,5 +250,40 @@ export class AboutComponent implements OnInit {
     // // in the next lesson, lets look at a practical use case
     // end of video 2.9
     ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 2.12
+
+    // in this lesson, we will investigate the unsubscribe behavior by making our observable
+    // cancel-able, which means subscribers to our observable will be able to cancel
+    // in-flight requests, which is a useful feature for search functionality
+    // if a search request is on-going and the user types in a different search term,
+    // we want to be able to cancel the on-going search request
+
+    // // a never-ending observable emitting incrementing values every 1s
+    // const interval1$ = interval(1000);
+    // const sub = interval1$.subscribe(console.log);
+
+    // // suppose after 5s, we would no longer like to receive any values
+    // // we want to receive values for a limited amount of time
+    // // to implement this, we would want to UNSUBSCRIBE from this observable
+    // setTimeout(() => {
+    //   sub.unsubscribe();
+    // }, 5000);
+
+    // in the createHttpObservable() method in util.ts, currently we have defined no logic to
+    // make the http observable cancel-able
+    // we will refactor that method and add cancellation logic to it now
+    // lets comment out the code above and define a new http observable to test unsubscribe
+
+    const http$ = createHttpObservable('/api/courses');
+    const sub = http$.subscribe(console.log);
+    // the http request will be initiated, but cancelled immediately before a server
+    // response is received, we should be able to observe a cancelled http req in
+    // the browser dev tools
+    setTimeout(() => sub.unsubscribe(), 0);
+
+    // let us see in the next lesson where this functionality would be useful
+    // end of video 2.12
+    ////////////////////////////////////////////////////////////////////////////////////////////
   }
 }
