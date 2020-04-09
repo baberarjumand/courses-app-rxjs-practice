@@ -104,46 +104,46 @@ export class CourseDialogComponent implements OnInit, AfterViewInit {
     ////////////////////////////////////////////////////////////////////////////////////////////
     // start of video 2.8
 
-    // we will see in this lesson a practical use of observable concatenation
-    // we will see why concatenation is ideally suited for save operations
-    // we want to make sure our save operations happen in the same order our form values are emitted
-    // our implementation in the last lesson does not provide that logic
+    // // we will see in this lesson a practical use of observable concatenation
+    // // we will see why concatenation is ideally suited for save operations
+    // // we want to make sure our save operations happen in the same order our form values are emitted
+    // // our implementation in the last lesson does not provide that logic
 
-    // we want to take the values of the source observable
-    // and for each value, create a new save observable
-    // then we want to concatenate all those derived observables, so that they execute in sequence
-    // this will ensure the save operations are done in the right order
-    // we have a mixture now of a mapping operation, where we are taking the value of
-    // form.valueChanges observable, and we are creating from it a second saveCourse$ observable
-    // this mixture of transforming one observable into another and concatenating the result together
-    // is best implemented using the concatMap() rxjs operator
-    // refer to official doc of concatMap() @ reactivex.io
-    // concatMap() will listen to values from first observable, map them to output
-    // then when all the first observable values are mapped and the first observable completes,
-    // then the concatMap() will start listening to the values emitted from the second observable,
-    // and start mapping them, it CONCATS and MAPS each observable in sequence
-    // only when the first observable completes is when the second observable values start getting mapped
+    // // we want to take the values of the source observable
+    // // and for each value, create a new save observable
+    // // then we want to concatenate all those derived observables, so that they execute in sequence
+    // // this will ensure the save operations are done in the right order
+    // // we have a mixture now of a mapping operation, where we are taking the value of
+    // // form.valueChanges observable, and we are creating from it a second saveCourse$ observable
+    // // this mixture of transforming one observable into another and concatenating the result together
+    // // is best implemented using the concatMap() rxjs operator
+    // // refer to official doc of concatMap() @ reactivex.io
+    // // concatMap() will listen to values from first observable, map them to output
+    // // then when all the first observable values are mapped and the first observable completes,
+    // // then the concatMap() will start listening to the values emitted from the second observable,
+    // // and start mapping them, it CONCATS and MAPS each observable in sequence
+    // // only when the first observable completes is when the second observable values start getting mapped
 
-    // in our case of the form on this page, we want to take the form values,
-    // turn them into http requests and wait for the first http req to complete before
-    // creating and executing the second http request
+    // // in our case of the form on this page, we want to take the form values,
+    // // turn them into http requests and wait for the first http req to complete before
+    // // creating and executing the second http request
 
-    this.form.valueChanges
-      .pipe(
-        filter(() => this.form.valid),
-        concatMap((changes) => this.saveCourse(changes))
-      )
-      .subscribe();
+    // this.form.valueChanges
+    //   .pipe(
+    //     filter(() => this.form.valid),
+    //     concatMap((changes) => this.saveCourse(changes))
+    //   )
+    //   .subscribe();
 
-    // on inspecting the http requests using browser dev tools, we observe that the http requests
-    // do not overlap anymore and are executed in sequence as expected
-    // the second save operation is only triggered once the first one completes
-    // later in the course, we will see another operator that will allow us to reduce the number of reqs
-    // that will be the debounceTime() operator
+    // // on inspecting the http requests using browser dev tools, we observe that the http requests
+    // // do not overlap anymore and are executed in sequence as expected
+    // // the second save operation is only triggered once the first one completes
+    // // later in the course, we will see another operator that will allow us to reduce the number of reqs
+    // // that will be the debounceTime() operator
 
-    // what if instead of having our operations execute in sequence like in this lesson,
-    // what if we want the operations to execute in parallel, as fast as possible
-    // this will lead us to another observable strategy called MERGE in the next lesson
+    // // what if instead of having our operations execute in sequence like in this lesson,
+    // // what if we want the operations to execute in parallel, as fast as possible
+    // // this will lead us to another observable strategy called MERGE in the next lesson
 
     // end of video 2.8
     ////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,6 +159,38 @@ export class CourseDialogComponent implements OnInit, AfterViewInit {
     // refer to about component to find code for this video
 
     // end of video 2.9
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 2.10
+
+    // in this lesson we will see merge() is ideal for performing http reqs in parallel
+    // when we used concatMap(), it ensured the second save operation would start only when
+    // the first save operation completes, that is the desired logic in this case
+    // but if you want to make multiple calls to backend in parallel and fetch results of
+    // each call as they arrive over time, then we can use mergeMap() operator
+    // refer to official doc for mergeMap() @ reactivex.io
+
+    // this.form.valueChanges
+    //   .pipe(
+    //     filter(() => this.form.valid),
+    //     mergeMap((changes) => this.saveCourse(changes))
+    //   )
+    //   .subscribe();
+
+    this.form.valueChanges
+      .pipe(
+        filter(() => this.form.valid),
+        concatMap((changes) => this.saveCourse(changes))
+      )
+      .subscribe();
+
+    // upon inspecting http reqs in browser dev tools, the expected parallel execution behavior is observed
+    // however, in this case, our desired operation for saves in concatMap()
+    // if order of execution is important when combining observables, use concatMap()
+    // if the desired order of execution doesn't matter and you want max speed using parallel
+    // execution, use mergeMap()
+    // in next lessons, we will cover exhaustMap() and switchMap()
+    // end of video 2.10
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 

@@ -243,12 +243,12 @@ export class AboutComponent implements OnInit {
     // however, if any one of the merged observables throws an error,
     // then the resulting merged observable errors out immediately
 
-    const interval1$ = interval(1000);
-    const interval2$ = interval1$.pipe(map((val) => val * 10));
+    // const interval1$ = interval(1000);
+    // const interval2$ = interval1$.pipe(map((val) => val * 10));
 
-    const result$ = merge(interval1$, interval2$);
+    // const result$ = merge(interval1$, interval2$);
 
-    result$.subscribe(console.log);
+    // result$.subscribe(console.log);
 
     // the merge strategy is ideal for performing long running operations in parallel
     // and getting the results of each of the operations combined
