@@ -112,17 +112,79 @@ export class HomeComponent implements OnInit {
     // tap() is used to make changes/execute code unrelated to the current observable
     // for example, changing some other variable in the component, or outputting to console
 
+    // const http$ = createHttpObservable("api/courses");
+    // const courses$: Observable<Course[]> = http$.pipe(
+    //   tap(() => {
+    //     console.log("HTTP Request executed!");
+    //   }),
+    //   map((res) => Object.values(res["payload"])),
+    //   shareReplay()
+    // );
+
+    // // testing if indeed there are no extra http reqs after shareReplay() operator is used
+    // // courses$.subscribe();
+
+    // this.beginnerCourses$ = courses$.pipe(
+    //   map((courses) =>
+    //     courses.filter((course) => course.category == "BEGINNER")
+    //   )
+    // );
+
+    // this.advancedCourses$ = courses$.pipe(
+    //   map((courses) =>
+    //     courses.filter((course) => course.category == "ADVANCED")
+    //   )
+    // );
+
+    // shareReplay() operator is very commonly used for handling http requests
+    // end of video 2.4
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 3.2
+
+    // we will cause the local data server to send an error http response
+    // and then see how we can catch that error in our observables
+
+    // 1. we can catch the error and recover from it by providing an alternative value (to the courses)
+    // 2. we can also catch the error, log it to the console and rethrow it to another
+    // observable that is consuming this observable
+    // 3. we can also retry the operation that just failed
+    // we will cover each of these three strategies
+
+    // we can catch the http error by using catchError operator
+    // the function inside this operator is supposed to return an observable that will be
+    // used to continue the observable that has errored out
+    // the catchError() provides an alternate observable that will be used in replacement
+    // of the original observable when the original observable errors out
+    // the catchError() can also throw an error, which will cause the courses$ to error out
+
+    // the of() creates an observable that emits one value and completes, which causes
+    // the courses$ to also complete
+
     const http$ = createHttpObservable("api/courses");
     const courses$: Observable<Course[]> = http$.pipe(
       tap(() => {
         console.log("HTTP Request executed!");
       }),
       map((res) => Object.values(res["payload"])),
-      shareReplay()
+      shareReplay(),
+      catchError((err) =>
+        of([
+          {
+            id: 0,
+            description: "RxJs In Practice Course",
+            iconUrl:
+              "https://s3-us-west-1.amazonaws.com/angular-university/course-images/rxjs-in-practice-course.png",
+            courseListIcon:
+              "https://angular-academy.s3.amazonaws.com/main-logo/main-page-logo-small-hat.png",
+            longDescription:
+              "Understand the RxJs Observable pattern, learn the RxJs Operators via practical examples",
+            category: "BEGINNER",
+            lessonsCount: 10,
+          },
+        ])
+      )
     );
-
-    // testing if indeed there are no extra http reqs after shareReplay() operator is used
-    // courses$.subscribe();
 
     this.beginnerCourses$ = courses$.pipe(
       map((courses) =>
@@ -136,8 +198,10 @@ export class HomeComponent implements OnInit {
       )
     );
 
-    // shareReplay() operator is very commonly used for handling http requests
-    // end of video 2.4
+    // in the next lessons, we will see how to re-throw the error
+    // we will also see how to retry the failed observable
+
+    // end of video 3.2
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 }
