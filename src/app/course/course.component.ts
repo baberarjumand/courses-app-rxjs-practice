@@ -145,32 +145,49 @@ export class CourseComponent implements OnInit, AfterViewInit {
     // you can observe cancelled http reqs in the browser dev tools
     // we are not yet displaying the search results, so we will implement that next
 
-    // currently we have a lessons$ observable that is emitted to show the current table of lessons
-    // we will convert this lessons$ to a combination to 2 different observables
-    // we want it to initially load all the lessons, that will be the initialLessons$ observable
-    // next, when the user starts typing in search box, we want to switch the output of
-    // the second stream which shows the results of the search string
-    // we want to combine 2 different observables, concatenation will help us here
-    // we want the first initial observable to get loaded, only then should we
-    // start responding to the search-strings/user-searches
+    // // currently we have a lessons$ observable that is emitted to show the current table of lessons
+    // // we will convert this lessons$ to a combination to 2 different observables
+    // // we want it to initially load all the lessons, that will be the initialLessons$ observable
+    // // next, when the user starts typing in search box, we want to switch the output of
+    // // the second stream which shows the results of the search string
+    // // we want to combine 2 different observables, concatenation will help us here
+    // // we want the first initial observable to get loaded, only then should we
+    // // start responding to the search-strings/user-searches
 
-    const searchLessons$ = fromEvent<any>(
-      this.input.nativeElement,
-      "keyup"
-    ).pipe(
+    // const searchLessons$ = fromEvent<any>(
+    //   this.input.nativeElement,
+    //   "keyup"
+    // ).pipe(
+    //   map((event) => event.target.value),
+    //   debounceTime(400),
+    //   distinctUntilChanged(),
+    //   switchMap((search) => this.loadLessons(search))
+    // );
+
+    // const initialLessons$ = this.loadLessons();
+
+    // this.lessons$ = concat(initialLessons$, searchLessons$);
+
+    // // in the next lessons, we will cover rxjs error handling
+
+    // end of video 2.15
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 3.5
+
+    // in this lesson, we will use the startWith() operator
+    // we will assign to the lessons$ the result of our type-ahead logic
+    // the startWith() operator allows us to initialize a stream with an initial value
+
+    this.lessons$ = fromEvent<any>(this.input.nativeElement, "keyup").pipe(
       map((event) => event.target.value),
+      startWith(""),
       debounceTime(400),
       distinctUntilChanged(),
       switchMap((search) => this.loadLessons(search))
     );
 
-    const initialLessons$ = this.loadLessons();
-
-    this.lessons$ = concat(initialLessons$, searchLessons$);
-
-    // in the next lessons, we will cover rxjs error handling
-
-    // end of video 2.15
+    // end of video 3.5
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 
