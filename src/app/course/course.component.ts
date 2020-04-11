@@ -44,7 +44,10 @@ export class CourseComponent implements OnInit, AfterViewInit {
     this.courseId = this.route.snapshot.params["id"];
     ////////////////////////////////////////////////////////////////////////////////////////////
     // start of video 2.13
-    this.course$ = createHttpObservable(`/api/courses/${this.courseId}`);
+    this.course$ = createHttpObservable(`/api/courses/${this.courseId}`)
+      .pipe(
+      // tap((course) => console.log("Course: ", course))
+      );
 
     // this line was moved in video 2.15
     // this.lessons$ = this.loadLessons();
@@ -231,15 +234,44 @@ export class CourseComponent implements OnInit, AfterViewInit {
     //   throttleTime(500)
     // ).subscribe(console.log);
 
+    // this.lessons$ = fromEvent<any>(this.input.nativeElement, "keyup").pipe(
+    //   map((event) => event.target.value),
+    //   startWith(""),
+    //   debounceTime(400),
+    //   distinctUntilChanged(),
+    //   switchMap((search) => this.loadLessons(search))
+    // );
+
+    // end of video 3.6
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 4.1
+
+    // in this lesson we will write our own custom operator, a debug operator that is going
+    // to help us debug out rxjs programs
+    // it is not always easy to understand what is going on just by reading observable chains
+    // we often use tap() to log output to console between operators
+    // as our programs get complex, we might get a lot of tap operators and a lot of output
+    // in the console as well, after solving the issue, we will end up going back and
+    // removing all those tap operators
+    // ideally we would like to keep the logging statements that helped us understand a
+    // given part of the program because we might use them later, but we would also like
+    // to turn them off, like logging systems in the backend where we have
+    // multiple logging levels
+    // we are going to create a custom operator called the debug operator that
+    // will allow us to turn logging on or off
+    // we will create a new file 'debug.ts' in /common where we will define this operator
+
     this.lessons$ = fromEvent<any>(this.input.nativeElement, "keyup").pipe(
       map((event) => event.target.value),
       startWith(""),
+      // tap((search) => console.log("search", search)),
       debounceTime(400),
       distinctUntilChanged(),
       switchMap((search) => this.loadLessons(search))
     );
 
-    // end of video 3.6
+    // end of video 4.1
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 
