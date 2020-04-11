@@ -22,7 +22,7 @@ import {
   throttle,
   throttleTime,
 } from "rxjs/operators";
-import { merge, fromEvent, Observable, concat, interval } from "rxjs";
+import { merge, fromEvent, Observable, concat, interval, forkJoin } from "rxjs";
 import { Lesson } from "../model/lesson";
 import { createHttpObservable } from "../common/util";
 import { debug, RxJsLoggingLevel, setRxJsLoggingLevel } from "../common/debug";
@@ -63,6 +63,20 @@ export class CourseComponent implements OnInit, AfterViewInit {
 
     // setRxJsLoggingLevel(RxJsLoggingLevel.DEBUG);
     setRxJsLoggingLevel(RxJsLoggingLevel.TRACE);
+
+    // // for video 4.3
+    // // a tuple value is returned when both observables complete the http reqs
+    // // the tuple has a course value and a lesson value
+    // const course$ = createHttpObservable(`/api/courses/${this.courseId}`);
+    // const lesson$ = this.loadLessons();
+    // forkJoin(course$, lesson$)
+    //   .pipe(
+    //     tap(([course, lessons]) => {
+    //       console.log("course", course);
+    //       console.log("lessons", lessons);
+    //     })
+    //   )
+    //   .subscribe();
   }
 
   ngAfterViewInit() {
@@ -293,6 +307,17 @@ export class CourseComponent implements OnInit, AfterViewInit {
     );
 
     // end of video 4.2
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 4.3
+
+    // the forkJoin() operator allows us to launch several tasks in parallel, waits for all those
+    // tasks to complete, then we can get back the results of each task and use those combined
+    // results together
+
+    // next concept we will cover is the notion of subject
+
+    // end of video 4.3
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 
