@@ -19,8 +19,10 @@ import {
   withLatestFrom,
   concatAll,
   shareReplay,
+  throttle,
+  throttleTime,
 } from "rxjs/operators";
-import { merge, fromEvent, Observable, concat } from "rxjs";
+import { merge, fromEvent, Observable, concat, interval } from "rxjs";
 import { Lesson } from "../model/lesson";
 import { createHttpObservable } from "../common/util";
 
@@ -175,9 +177,59 @@ export class CourseComponent implements OnInit, AfterViewInit {
     ////////////////////////////////////////////////////////////////////////////////////////////
     // start of video 3.5
 
-    // in this lesson, we will use the startWith() operator
-    // we will assign to the lessons$ the result of our type-ahead logic
-    // the startWith() operator allows us to initialize a stream with an initial value
+    // // in this lesson, we will use the startWith() operator
+    // // we will assign to the lessons$ the result of our type-ahead logic
+    // // the startWith() operator allows us to initialize a stream with an initial value
+
+    // this.lessons$ = fromEvent<any>(this.input.nativeElement, "keyup").pipe(
+    //   map((event) => event.target.value),
+    //   startWith(""),
+    //   debounceTime(400),
+    //   distinctUntilChanged(),
+    //   switchMap((search) => this.loadLessons(search))
+    // );
+
+    // end of video 3.5
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 3.6
+
+    // in this lesson, we will see the throttleTime() operator
+    // let us discuss the concept of throttling first and see how it compares to debounceTime()
+    // they are 2 closely related concepts that are often mixed up
+
+    // // in this case, we only see output on console once the value has been stable for 400ms
+    // // if the user keeps typing relatively quickly, there will never be an output to console
+    // // debouncing is about waiting for value to get stable
+    // // this is different from throttling
+    // fromEvent<any>(this.input.nativeElement, "keyup").pipe(
+    //   map((event) => event.target.value),
+    //   debounceTime(400)
+    // ).subscribe(console.log);
+
+    // throttling is similar to debounceTime() in the purpose that we are trying to reduce the
+    // number of values emitted from the observable, but the way it happens is very different
+    // refer to offical doc for throttle() at reactivex.io
+    // throttle is about reducing the number of emitted values by limiting the number of values
+    // that can be emitted in a certain interval, for that, it uses an auxiallary timer
+    // observable that determines when should we emit a value from the input stream
+    // whenever the timer observable emits a value, then we should also emit a value to
+    // the output stream, we can use the timer observable to vary the throttling rate
+    // according to some external condition as well if required
+    // the timer observable can have any logic, it does not have to be a periodic interval
+    // let us use throttling instead of debouncing in our example
+
+    // // the function instead the throttle() operator should return an observable
+    // // in this case, we will have one value every 0.5s in the console
+    // // however, in this approach, we do not have a guarantee that output value is the
+    // // latest in the stream
+    // // in case of type-ahead, we want to use debounceTime() to make sure we have
+    // // the latest value in the stream when user types
+    // fromEvent<any>(this.input.nativeElement, "keyup").pipe(
+    //   map((event) => event.target.value),
+    //   // throttle(() => interval(500)),
+    //   throttleTime(500)
+    // ).subscribe(console.log);
 
     this.lessons$ = fromEvent<any>(this.input.nativeElement, "keyup").pipe(
       map((event) => event.target.value),
@@ -187,7 +239,7 @@ export class CourseComponent implements OnInit, AfterViewInit {
       switchMap((search) => this.loadLessons(search))
     );
 
-    // end of video 3.5
+    // end of video 3.6
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 
