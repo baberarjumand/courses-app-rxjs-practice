@@ -25,6 +25,7 @@ import {
 import { merge, fromEvent, Observable, concat, interval } from "rxjs";
 import { Lesson } from "../model/lesson";
 import { createHttpObservable } from "../common/util";
+import { debug, RxJsLoggingLevel, setRxJsLoggingLevel } from "../common/debug";
 
 @Component({
   selector: "course",
@@ -44,10 +45,7 @@ export class CourseComponent implements OnInit, AfterViewInit {
     this.courseId = this.route.snapshot.params["id"];
     ////////////////////////////////////////////////////////////////////////////////////////////
     // start of video 2.13
-    this.course$ = createHttpObservable(`/api/courses/${this.courseId}`)
-      .pipe(
-      // tap((course) => console.log("Course: ", course))
-      );
+    // this.course$ = createHttpObservable(`/api/courses/${this.courseId}`);
 
     // this line was moved in video 2.15
     // this.lessons$ = this.loadLessons();
@@ -57,6 +55,14 @@ export class CourseComponent implements OnInit, AfterViewInit {
 
     // end of video 2.13
     ////////////////////////////////////////////////////////////////////////////////////////////
+
+    this.course$ = createHttpObservable(`/api/courses/${this.courseId}`).pipe(
+      // tap((course) => console.log("Course: ", course)),
+      debug(RxJsLoggingLevel.INFO, "course val")
+    );
+
+    // setRxJsLoggingLevel(RxJsLoggingLevel.DEBUG);
+    setRxJsLoggingLevel(RxJsLoggingLevel.TRACE);
   }
 
   ngAfterViewInit() {
@@ -260,18 +266,33 @@ export class CourseComponent implements OnInit, AfterViewInit {
     // multiple logging levels
     // we are going to create a custom operator called the debug operator that
     // will allow us to turn logging on or off
-    // we will create a new file 'debug.ts' in /common where we will define this operator
+    // // we will create a new file 'debug.ts' in /common where we will define this operator
+
+    // this.lessons$ = fromEvent<any>(this.input.nativeElement, "keyup").pipe(
+    //   map((event) => event.target.value),
+    //   startWith(""),
+    //   // tap((search) => console.log("search", search)),
+    //   debounceTime(400),
+    //   distinctUntilChanged(),
+    //   switchMap((search) => this.loadLessons(search))
+    // );
+
+    // end of video 4.1
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 4.2
 
     this.lessons$ = fromEvent<any>(this.input.nativeElement, "keyup").pipe(
       map((event) => event.target.value),
       startWith(""),
-      // tap((search) => console.log("search", search)),
+      debug(RxJsLoggingLevel.TRACE, "search"),
       debounceTime(400),
       distinctUntilChanged(),
-      switchMap((search) => this.loadLessons(search))
+      switchMap((search) => this.loadLessons(search)),
+      debug(RxJsLoggingLevel.DEBUG, "lessons val")
     );
 
-    // end of video 4.1
+    // end of video 4.2
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 
