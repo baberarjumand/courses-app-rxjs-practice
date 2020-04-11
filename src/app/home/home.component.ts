@@ -218,32 +218,79 @@ export class HomeComponent implements OnInit {
     // finalize() gets invoked in one of two cases:
     // when observable completes, or when observable errors out
 
-    // two error messages are displayed when catchError() is placed after shareReplay() because
-    // two subscriptions error out, the beginner and advanced courses
-    // if we want to make the error get thrown once only, we move the catchError() up the
-    // observable chain
+    // // two error messages are displayed when catchError() is placed after shareReplay() because
+    // // two subscriptions error out, the beginner and advanced courses
+    // // if we want to make the error get thrown once only, we move the catchError() up the
+    // // observable chain
+
+    // const http$ = createHttpObservable("api/courses");
+    // const courses$: Observable<Course[]> = http$.pipe(
+    //   catchError((err) => {
+    //     console.log("Error occurred", err);
+    //     return throwError(err);
+    //   }),
+    //   finalize(() => {
+    //     console.log("Finalize executed...");
+    //   }),
+    //   tap(() => {
+    //     console.log("HTTP Request executed!");
+    //   }),
+    //   map((res) => Object.values(res["payload"])),
+    //   shareReplay()
+    //   // catchError((err) => {
+    //   //   console.log("Error occurred", err);
+    //   //   return throwError(err);
+    //   // }),
+    //   // finalize(() => {
+    //   //   console.log("Finalize executed...");
+    //   // })
+    // );
+
+    // this.beginnerCourses$ = courses$.pipe(
+    //   map((courses) =>
+    //     courses.filter((course) => course.category == "BEGINNER")
+    //   )
+    // );
+
+    // this.advancedCourses$ = courses$.pipe(
+    //   map((courses) =>
+    //     courses.filter((course) => course.category == "ADVANCED")
+    //   )
+    // );
+
+    // // in the next lesson, we will retry the http request if it fails
+
+    // end of video 3.3
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 3.4
+
+    // in this lesson, we will cover the retry error handling strategy
+
+    // when a req to a backend fails, another call within a few seconds might succeed e.g. if
+    // the load on the backend reduces
+    // if a req fails, we will wait for 2s and then try again
+    // for this, we will use the retryWhen() operator
+
+    // retryWhen() will throw an error each time the stream throws an error
+    // when the http stream throws an error, it will error out and not complete
+    // retryWhen() will try to create a brand new stream and subscribe to it
+    // it will keep doing this until the new stream does not error out
+    // retryWhen() should return an observable, this observable will tell
+    // when to retry
+    // we can immediately retry by returning errors observable itself
+    // in practice, we don't want to retry immediately
+    // lets say we want to wait for 2s before retrying
+    // we will use the delayWhen() operator for this
 
     const http$ = createHttpObservable("api/courses");
     const courses$: Observable<Course[]> = http$.pipe(
-      catchError((err) => {
-        console.log("Error occurred", err);
-        return throwError(err);
-      }),
-      finalize(() => {
-        console.log("Finalize executed...");
-      }),
       tap(() => {
         console.log("HTTP Request executed!");
       }),
       map((res) => Object.values(res["payload"])),
-      shareReplay()
-      // catchError((err) => {
-      //   console.log("Error occurred", err);
-      //   return throwError(err);
-      // }),
-      // finalize(() => {
-      //   console.log("Finalize executed...");
-      // })
+      shareReplay(),
+      retryWhen((errors) => errors.pipe(delayWhen(() => timer(2000))))
     );
 
     this.beginnerCourses$ = courses$.pipe(
@@ -258,9 +305,9 @@ export class HomeComponent implements OnInit {
       )
     );
 
-    // in the next lesson, we will retry the http request if it fails
+    // in the browser, we can observer a series of failed http reqs until one succeeds
 
-    // end of video 3.3
+    // end of video 3.4
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 }
