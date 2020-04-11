@@ -1,6 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { Course } from "../model/course";
-import { interval, Observable, of, timer } from "rxjs";
+import { interval, Observable, of, timer, throwError } from "rxjs";
 import {
   catchError,
   delayWhen,
@@ -8,6 +8,7 @@ import {
   retryWhen,
   shareReplay,
   tap,
+  finalize,
 } from "rxjs/operators";
 import { createHttpObservable } from "../common/util";
 
@@ -158,32 +159,91 @@ export class HomeComponent implements OnInit {
     // of the original observable when the original observable errors out
     // the catchError() can also throw an error, which will cause the courses$ to error out
 
-    // the of() creates an observable that emits one value and completes, which causes
-    // the courses$ to also complete
+    // // the of() creates an observable that emits one value and completes, which causes
+    // // the courses$ to also complete
+
+    // const http$ = createHttpObservable("api/courses");
+    // const courses$: Observable<Course[]> = http$.pipe(
+    //   tap(() => {
+    //     console.log("HTTP Request executed!");
+    //   }),
+    //   map((res) => Object.values(res["payload"])),
+    //   shareReplay(),
+    //   catchError((err) =>
+    //     of([
+    //       {
+    //         id: 0,
+    //         description: "RxJs In Practice Course",
+    //         iconUrl:
+    //           "https://s3-us-west-1.amazonaws.com/angular-university/course-images/rxjs-in-practice-course.png",
+    //         courseListIcon:
+    //           "https://angular-academy.s3.amazonaws.com/main-logo/main-page-logo-small-hat.png",
+    //         longDescription:
+    //           "Understand the RxJs Observable pattern, learn the RxJs Operators via practical examples",
+    //         category: "BEGINNER",
+    //         lessonsCount: 10,
+    //       },
+    //     ])
+    //   )
+    // );
+
+    // this.beginnerCourses$ = courses$.pipe(
+    //   map((courses) =>
+    //     courses.filter((course) => course.category == "BEGINNER")
+    //   )
+    // );
+
+    // this.advancedCourses$ = courses$.pipe(
+    //   map((courses) =>
+    //     courses.filter((course) => course.category == "ADVANCED")
+    //   )
+    // );
+
+    // // in the next lessons, we will see how to re-throw the error
+    // // we will also see how to retry the failed observable
+
+    // end of video 3.2
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////
+    // start of video 3.3
+
+    // in this lesson, we will see how to use the catch and rethrow error handling strategy
+    // we will also see how to implement clean-up operations when an observables fails or completes
+
+    // unlike the last lesson, where the catchError() returned an observable that emitted
+    // one course value and completed, we will throw an observable that immediately
+    // errors out with the err that we get in catchError()
+
+    // clean-up operations can be implemented using the finalize() operator
+    // finalize() gets invoked in one of two cases:
+    // when observable completes, or when observable errors out
+
+    // two error messages are displayed when catchError() is placed after shareReplay() because
+    // two subscriptions error out, the beginner and advanced courses
+    // if we want to make the error get thrown once only, we move the catchError() up the
+    // observable chain
 
     const http$ = createHttpObservable("api/courses");
     const courses$: Observable<Course[]> = http$.pipe(
+      catchError((err) => {
+        console.log("Error occurred", err);
+        return throwError(err);
+      }),
+      finalize(() => {
+        console.log("Finalize executed...");
+      }),
       tap(() => {
         console.log("HTTP Request executed!");
       }),
       map((res) => Object.values(res["payload"])),
-      shareReplay(),
-      catchError((err) =>
-        of([
-          {
-            id: 0,
-            description: "RxJs In Practice Course",
-            iconUrl:
-              "https://s3-us-west-1.amazonaws.com/angular-university/course-images/rxjs-in-practice-course.png",
-            courseListIcon:
-              "https://angular-academy.s3.amazonaws.com/main-logo/main-page-logo-small-hat.png",
-            longDescription:
-              "Understand the RxJs Observable pattern, learn the RxJs Operators via practical examples",
-            category: "BEGINNER",
-            lessonsCount: 10,
-          },
-        ])
-      )
+      shareReplay()
+      // catchError((err) => {
+      //   console.log("Error occurred", err);
+      //   return throwError(err);
+      // }),
+      // finalize(() => {
+      //   console.log("Finalize executed...");
+      // })
     );
 
     this.beginnerCourses$ = courses$.pipe(
@@ -198,10 +258,9 @@ export class HomeComponent implements OnInit {
       )
     );
 
-    // in the next lessons, we will see how to re-throw the error
-    // we will also see how to retry the failed observable
+    // in the next lesson, we will retry the http request if it fails
 
-    // end of video 3.2
+    // end of video 3.3
     ////////////////////////////////////////////////////////////////////////////////////////////
   }
 }
