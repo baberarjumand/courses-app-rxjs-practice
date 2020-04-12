@@ -11,6 +11,8 @@ import {
   merge,
   Subject,
   BehaviorSubject,
+  AsyncSubject,
+  ReplaySubject,
 } from "rxjs";
 import { delayWhen, filter, map, take, timeout } from "rxjs/operators";
 import { createHttpObservable } from "../common/util";
@@ -121,33 +123,98 @@ export class AboutComponent implements OnInit {
     // BehaviorSubject requires an initial value because the goal
     //  of BehaviorSubject is to always provide something to subscribers
 
-    // an initial value of 0 ensures if any subscriptions occur before
-    //  any values are emitted, they will receive 0
-    const subject = new BehaviorSubject(0);
-    const series$ = subject.asObservable();
+    // // an initial value of 0 ensures if any subscriptions occur before
+    // //  any values are emitted, they will receive 0
+    // const subject = new BehaviorSubject(0);
+    // const series$ = subject.asObservable();
 
-    // this is an early subscription i.e. before values get emitted
-    series$.subscribe(val => console.log("early sub: " + val));
+    // // this is an early subscription i.e. before values get emitted
+    // series$.subscribe(val => console.log("early sub: " + val));
 
-    subject.next(1);
-    subject.next(2);
-    subject.next(3);
+    // subject.next(1);
+    // subject.next(2);
+    // subject.next(3);
 
-    // if completion happens before a late subscription, the late sub will
-    //  not receive the last emitted value
-    // subject.complete();
+    // // if completion happens before a late subscription, the late sub will
+    // //  not receive the last emitted value
+    // // subject.complete();
 
-    // to simulate a late subscription, lets use a timeout
-    setTimeout(() => {
-      series$.subscribe(val => console.log("late sub: " + val));
-      subject.next(4);
-    }, 3000);
+    // // to simulate a late subscription, lets use a timeout
+    // setTimeout(() => {
+    //   series$.subscribe(val => console.log("late sub: " + val));
+    //   subject.next(4);
+    // }, 3000);
 
     // BehaviorSubject is the most commonly used subject, and we will use
     //  it to implement our store functionality
     // Before we do that, we will cover AsyncSubject and ReplaySubject
 
     // end of video 5.3
+    ///////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////
+    // start of video 5.4
+
+    // in this lesson, we will see 2 other types of subjects:
+    //  AsyncSubject and ReplaySubject
+
+    // ASYNC SUBJECT EXAMPLE
+    // suppose that we have a long running calculation within some
+    //  operation, and it is returning intermediate values while
+    //  calculating before the calculation completes
+    // in this case, if we are only interested in the last value after
+    //  the calculation complete, we use the AsyncSubject
+
+    // AsyncSubject will wait for completion before emitting any values
+    //  to one or multiple subscribers
+    // The value emitted is going to be the last value right before
+    //  completion
+
+    // const subject = new AsyncSubject();
+    // const series$ = subject.asObservable();
+
+    // series$.subscribe(val => console.log("first sub: " + val));
+
+    // subject.next(1);
+    // subject.next(2);
+    // subject.next(3);
+
+    // // if we comment out complete(), no value will be received by series$
+    // subject.complete();
+
+    // // late subscribers also receive last value just before completion
+    // setTimeout(() => {
+    //   series$.subscribe(val => console.log("second sub: " + val));
+    // }, 3000)
+
+    // AsyncSubject is ideal for long-running operations, where we only
+    //  want the last value after operation completes
+
+    // REPLAY SUBJECT EXAMPLE
+    // there are situations where late subscribers might want to receive all
+    //  emitted values, from the first emitted value to the last one
+    // for that, we use ReplaySubject()
+
+    const subject = new ReplaySubject();
+    const series$ = subject.asObservable();
+
+    series$.subscribe(val => console.log("first sub: " + val));
+
+    subject.next(1);
+    subject.next(2);
+    subject.next(3);
+
+    // ReplaySubject is not linked with completion
+    // even if we comment out complete(), all subscribers, late or early
+    //  will receive all values
+    // subject.complete();
+
+    // replaySubject will replay all values to all later subscribers
+    setTimeout(() => {
+      series$.subscribe(val => console.log("second sub: " + val));
+      subject.next(4);
+    }, 3000)
+
+    // end of video 5.4
     ///////////////////////////////////////////////////////////////////
   }
 }
