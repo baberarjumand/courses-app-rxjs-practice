@@ -3,6 +3,7 @@ import { Observable, BehaviorSubject, Subject, timer } from "rxjs";
 import { Course } from "../model/course";
 import { createHttpObservable } from "./util";
 import { tap, map, shareReplay, retryWhen, delayWhen } from "rxjs/operators";
+import { fromPromise } from "rxjs/internal-compatibility";
 
 @Injectable({
   providedIn: "root",
@@ -77,5 +78,62 @@ export class Store {
   //  in the storeService
 
   // end of video 5.6
+  ///////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////
+  // start of video 5.7
+
+  // in the last lesson, we setup our storeService in a read-only manner
+  // in this lesson, we will implement the ability to edit courses
+  //  when user clicks edit on the homepage, and changes are made
+  //  via the course-dialog component
+  // on editing, a new http req will be sent to the backend to save the
+  //  new modified data
+  // we would also like to emit that new value so that the rest of the app
+  //  receives the latest value, while the backend saveReq is still ongoing
+
+  // first, this method is going to save the course in store memory
+  //  and broadcast the new value to all subscribers
+  // so the store is going to be modified in memory first
+  // then a req is going to be made to the backend and the new data
+  //  is also going to be saved in our db
+
+  saveCourse(courseId: number, changes): Observable<any> {
+    // this will get us a ref to the whole array of courses
+    const courses = this.subject.getValue();
+
+    // this will find the index of the course we want to modify
+    const courseIndex = courses.findIndex((course) => course.id === courseId);
+
+    // this creates a copy of the courses array
+    const newCourses = courses.slice(0);
+
+    // console.log(newCourses[courseIndex]);
+    // the new javascript object overwrites the old one
+    newCourses[courseIndex] = {
+      ...courses[courseIndex],
+      ...changes,
+    };
+    // console.log(newCourses[courseIndex]);
+
+    // this broadcasts the new courses array with the modified data
+    this.subject.next(newCourses);
+
+    // to save to the backend, we need to make a http req
+    return fromPromise(
+      fetch(`/api/courses/${courseId}`, {
+        method: "PUT",
+        body: JSON.stringify(changes),
+        headers: {
+          "content-type": "application/json",
+        },
+      })
+    );
+  }
+
+  // note that in this implementation of the save function, we are optimistically
+  //  modifying the in-memory storeService data, where we are assuming
+  //  back-end save call will be successful
+
+  // end of video 5.7
   ///////////////////////////////////////////////////////////////////
 }
