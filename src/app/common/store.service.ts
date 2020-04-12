@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { Observable, BehaviorSubject, Subject, timer } from "rxjs";
 import { Course } from "../model/course";
 import { createHttpObservable } from "./util";
-import { tap, map, shareReplay, retryWhen, delayWhen } from "rxjs/operators";
+import { tap, map, shareReplay, retryWhen, delayWhen, filter } from "rxjs/operators";
 import { fromPromise } from "rxjs/internal-compatibility";
 
 @Injectable({
@@ -135,5 +135,20 @@ export class Store {
   //  back-end save call will be successful
 
   // end of video 5.7
+  ///////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////
+  // start of video 5.8
+
+  // in this lesson, we are refactoring course.component.ts to use
+  //  the storeService
+
+  selectCourseById(courseId: number) {
+    return this.courses$.pipe(
+      map((courses) => courses.find((course) => course.id == courseId)),
+      filter(course => !!course)
+    );
+  }
+
+  // end of video 5.8
   ///////////////////////////////////////////////////////////////////
 }
